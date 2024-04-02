@@ -1,10 +1,10 @@
 import express from 'express';
 import { Request, Response } from 'express';
-// import { getUser, getUserByEmail, deleteUserById, createUser } from '../service/userservice';
 import { authentication, random } from '../utils/const/authen';
 import { generateVerificationToken } from '../utils/generateToken';
 import { sendVerification } from '../utils/sendVerification';
 import {UserService} from "../service/userservice"
+import { saveToken } from '../service/userToken';
 
 const userservice = new UserService();
 
@@ -88,8 +88,13 @@ export class UserController {
         },
       });
 
-      const token = generateVerificationToken();
-      sendVerification(email, token);
+      // const token = generateVerificationToken();
+      // sendVerification(email, token);
+
+      const token = generateVerificationToken(user.id)
+
+      await saveToken(user.id, token)
+
       return res.status(200).end(user);
     } catch (error) {
       console.log(error);
