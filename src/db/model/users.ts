@@ -33,33 +33,33 @@ const UserSchema = new mongoose.Schema({
 
 export const UserModel = mongoose.model("User", UserSchema);
 
-//getUser
-export const getUser = () => UserModel.find();
+// //getUser
+// export const getUser = () => UserModel.find();
 
-//getUserByEmail
-export const getUserByEmail = (email: string) => UserModel.findOne({ email });
+// //getUserByEmail
+// export const getUserByEmail = (email: string) => UserModel.findOne({ email });
 
-//getUserBysessionToken
-export const getUserBySessionToken = (sessionToken: string) =>
-  UserModel.findOne({
-    "authentication.sessionToken": sessionToken,
-  });
+// //getUserBysessionToken
+// export const getUserBySessionToken = (sessionToken: string) =>
+//   UserModel.findOne({
+//     "authentication.sessionToken": sessionToken,
+//   });
 
-  //getUserById
-export const getUserById = (id: string) => UserModel.findOne({ id });
+//   //getUserById
+// export const getUserById = (id: string) => UserModel.findOne({ id });
 
-//createUser
+// //createUser
+// // export const createUser = (values: Record<string, any>) =>
+// //   new UserModel(values).save().then((user) => user.toObject());
 // export const createUser = (values: Record<string, any>) =>
-//   new UserModel(values).save().then((user) => user.toObject());
-export const createUser = (values: Record<string, any>) =>
-  new UserModel({ ...values, isVerified: false }).save().then((user) => user.toObject());
+//   new UserModel({ ...values, isVerified: false }).save().then((user) => user.toObject());
 
-  //deleteUserById  
-export const deleteUserById = (id: string) =>
-  UserModel.findOneAndDelete({ _id: id });
+//   //deleteUserById  
+// export const deleteUserById = (id: string) =>
+//   UserModel.findOneAndDelete({ _id: id });
 
-  //updateUSerById  
-export const updateUserById = (id: string, values: Record<string, any>) =>
-  UserModel.findOneAndDelete({ id, values });
+//   //updateUSerById  
+// export const updateUserById = (id: string, values: Record<string, any>) =>
+//   UserModel.findOneAndDelete({ id, values });
 
   
