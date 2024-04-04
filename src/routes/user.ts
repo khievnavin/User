@@ -7,6 +7,5 @@ const router = express.Router();
 export default(): express.Router =>{
     authentication(router);
     userRoute(router);
-
     return router;
 }

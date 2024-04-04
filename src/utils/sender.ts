@@ -7,7 +7,7 @@ export const sender = nodemailer.createTransport({
     secure: false,
     auth: {
         user: "khievnavin@gmail.com",
-        pass: "wiswnprjsxrqyiwx"
+        pass: "wiswnprjsxrqyiwx"   //account gmail => app password => name => password generated
     }
 })
 // const verifymail = async (email: string, link: string, res: Response)=>{

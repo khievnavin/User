@@ -1,9 +1,8 @@
 import {UserModel}  from '../db/model/users'; // Import your User model here
 import { UserRepository } from '../db/model/repository/userRepo';
+import Token from '../db/model/token';
 export class UserService {
-
     private userRepository: UserRepository;
-
     constructor() {
         this.userRepository = new UserRepository();
     }
@@ -77,4 +76,51 @@ export class UserService {
       throw new Error('Failed to update user by ID');
     }
   }
+  
+    async verifyToken(token: string): Promise<any> {
+      try {
+       const isTokenExits:any = await Token.find({token: token});
+
+       if(!isTokenExits){
+        throw new Error('token is not found')
+       }
+
+       const user = await UserModel.findOne(isTokenExits.userId);
+
+       if(!user){
+        throw new Error('user is not found');
+       }
+       user.isVerified = true;
+        await user.save();
+
+        return user;
+        
+      } catch (error) {
+        console.error("Error verifying token and setting verification status:", error);
+        return false;
+      }
+    }
+  //   async updateVerificationStatus(userId: string, verified: boolean): Promise<any> {
+  //     try {
+  //         // Find the user by ID and update the verification status
+  //         const updatedUser = await UserModel.findByIdAndUpdate(userId);
+
+  //         if (!updatedUser) {
+  //             console.log("User not found");
+  //             return false;
+  //         }
+  //        updatedUser.isVerified = true;
+  //         return  updatedUser
+          
+  //     } catch (error) {
+  //         console.error("Error updating verification status:", error);
+  //         return false;
+  //     }
+  // }
+  
+
+
+
 }
+//   async verifyUser (token : string) :{
+//     const isToekn: await this.tok

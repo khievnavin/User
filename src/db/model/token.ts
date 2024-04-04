@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { Schema } from "mongoose";
 
 const tokenSchema = new mongoose.Schema({
     userId: {type: mongoose.Schema.Types.ObjectId ,  require: true},

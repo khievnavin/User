@@ -12,3 +12,15 @@
 //     console.log("Token expires at:", new Date(expiresAt));
 //     return token;	
 // }
+
+//============================================================================
+
+// import jwt from 'jsonwebtoken';
+
+// export function generatedJWT(userID: string){
+//     const jwtToken = jwt.sign({userID}, "hello",{
+//     expiresIn: "1h",
+// });
+// return jwtToken;
+// }
+

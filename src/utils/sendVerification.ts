@@ -1,3 +1,4 @@
+// require ("dotenv").config();
 import { sender } from "./sender";
 
 export async function sendVerification(email: string , token: string){
@@ -7,7 +8,8 @@ export async function sendVerification(email: string , token: string){
         from: "khievnavin@gmail.com",
         to : email,
         subject: "Verify your Email account",
-        text: `Click here to verify your account:  ${link}    /   ${token}`
+        text: `Click here to verify your account:  ${link}    /   ${token}`,
+
     };
     await sender.sendMail(mailOptions)
 }

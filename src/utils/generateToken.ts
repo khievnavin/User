@@ -1,5 +1,5 @@
 import { randomBytes } from 'crypto'
 
-export function generateVerificationToken(userId: number){ 
+export function generateVerificationToken(){ 
     return randomBytes(32).toString('hex')
 }
