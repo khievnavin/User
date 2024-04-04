@@ -15,12 +15,11 @@
 
 //============================================================================
 
-// import jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
+const SECRET_KEY = 'NAVIN';
 
-// export function generatedJWT(userID: string){
-//     const jwtToken = jwt.sign({userID}, "hello",{
-//     expiresIn: "1h",
-// });
-// return jwtToken;
-// }
+export function generatedJWT(){
+    const jwtToken = jwt.sign({}, SECRET_KEY, { expiresIn: '2m' });
 
+return jwtToken;
+}

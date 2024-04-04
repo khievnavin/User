@@ -1,28 +1,41 @@
-import express, { Router, Request, Response ,NextFunction } from 'express';
+import express, {  Request, Response ,NextFunction } from 'express';
 import { UserController } from '../controller/userController';
 import { isAuthenticated ,isOwner } from '../middleware/usermiddleware';
+import  {generatedJWT} from '../utils/jwt'
+
+
 
 import jwt, { JwtPayload } from 'jsonwebtoken';
+const Router = express.Router()
 
 const userController = new UserController();
-export default (router: express.Router) =>{
-    router.get('/users', isAuthenticated , userController.getAllUsers);
-    router.delete('/users/:id',  userController.deleteUser);
-    router.post('/users/verified', async (req:Request, res: Response, _next: NextFunction) =>{
+
+    Router.get('/users', isAuthenticated , userController.getAllUsers);
+    Router.delete('/users/:id',  userController.deleteUser);
+    Router.post('/users/register',userController.register);
+    Router.post('/users/login', userController.login );
+
+    Router.get('/users/verify', async (req:Request, res: Response, _next: NextFunction) =>{
         try{
-            const  queryTokne = req.query.token as string;
-            const response = await userController.verifyToken(queryTokne)
-            
+
+            // res.json({
+            //     message: "vath"
+            // })
+
+
+            const  queryToken = req.query.token as string;
+            console.log(queryToken)
+            const response = await userController.verifyToken(queryToken)
             res.json({
-                message: 'successfully',
-                user: response
+                message:  `Verified successfully`
             });
+          await response.deleteOne(queryToken) 
         }catch(error){
             _next(error)
         };
     });
 
-};
+export default Router
   
 export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers["authorization"];

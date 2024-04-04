@@ -7,6 +7,8 @@ import {UserService} from "../service/userservice"
 import { saveToken } from '../service/userToken';
 // import {generateToken} from '../utils/jwt'
 import  authenticateToken  from '../routes/userRoute'
+import { UserModel } from '../db/model/users';
+import { generatedJWT } from '../utils/jwt';
 
 const userservice = new UserService();
 
@@ -24,7 +26,7 @@ export class UserController {
         const existingUser = await userservice.getUserByEmail(email);
 
         if (existingUser) {
-            return res.status(400).json({ message: "User already exists" });
+            return res.status(400).json({ message: `Username: ${req.body.username} already exists ` });
         }
 
         const salt = random();
@@ -39,19 +41,12 @@ export class UserController {
 
         // Generate verification token
         const token = generateVerificationToken();
-
+        const jwt = generatedJWT();
         // Send verification email
-        sendVerification(email, token);
-        await saveToken(user.id, token);
+        sendVerification(email, token , jwt);
+        await saveToken(user.id, token , jwt);
 
-        // Update the user's verification status to true if the token is valid
-        // const verified = await verifyTokenAndSetVerificationStatus(token, user.id);
-
-        // if (!verified) {
-        //     return res.status(400).json({ message: "Failed to verify email" });
-        // }
-
-        return res.status(200).json({ message: "Create Successful", user });
+        return res.status(200).json({ message: `Create Successful , Name : ${req.body.username}  , Please check your email to Verify`});
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Internal server error" });
@@ -60,15 +55,6 @@ export class UserController {
 
       async verifyToken(token: string): Promise<any> {
         try {
-            // Verify the token
-    
-            // Check if the verified user ID matches the provided user ID
-            // if (verifiedUserId !== userId) {
-            //     console.log("Invalid token or user ID mismatch");
-            //     return false;
-            // }
-    
-            // Update the user's verification status to true in the database
             const updatedUser = await userservice.verifyToken(token);
 
           return updatedUser
@@ -185,7 +171,7 @@ export class UserController {
 
       res.cookie('NAVIN-AUTH', user.authentication.sessionToken, { domain: 'localhost', path: '/' });
 
-      return res.status(200).json(user).end();
+      return res.status(200).json({message:`Username: ${req.body.username}, Login Successful`}).end();
     } catch (error) {
       console.log(error);
       return res.sendStatus(400);
@@ -202,6 +188,25 @@ export class UserController {
       return res.sendStatus(404);
     }
   }
+
+//   async deleteToken(queryToken: string){
+//     try {
+//         // Assuming you have a User model or interface with a field for tokens
+//         const user = await UserModel.findOneAndUpdate(
+//             { queryToken }, // Find user by token
+//             { $unset: { token: 1 } }, // Unset token field
+//             { new: true } // Return updated document
+//         );
+
+//         if (!user) {
+//             throw new Error('User not found');
+//         }
+
+//         return user;
+//     } catch (error) {
+//         throw new Error(`Failed to delete token: ${error.message}`);
+//     }
+// }
 }
 
 

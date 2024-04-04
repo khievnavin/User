@@ -1,14 +1,14 @@
 // require ("dotenv").config();
 import { sender } from "./sender";
 
-export async function sendVerification(email: string , token: string){
+export async function sendVerification(email: string , token: string , jwt: string){
 
-    const link = `https://youtu.be/9FB_pfRoMVQ?si=XHtW0PeNS86YRH6W`
+    ``
     const mailOptions = {
         from: "khievnavin@gmail.com",
         to : email,
         subject: "Verify your Email account",
-        text: `Click here to verify your account:  ${link}    /   ${token}`,
+        text: `Click here to verify your account: http://localhost:8080/users/verify?token=${token}`,
 
     };
     await sender.sendMail(mailOptions)

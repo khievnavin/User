@@ -25,7 +25,7 @@ export const isOwner = async (req: express.Request, res: express.Response, next:
 
 export const  isAuthenticated = async (req: express.Request , res: express.Response , next: express.NextFunction)=>{
     try{
-        const sessionToken = req.cookies['NAVIN-AUTH'];
+        const sessionToken = req.cookies['NAVIN'];
 
         if(!sessionToken){
             return res.sendStatus(403);

@@ -1,9 +1,9 @@
-import express from 'express';
-import { UserController} from '../controller/userController';
+// import express from 'express';
+// import { UserController} from '../controller/userController';
  
-const userController = new UserController();
+// const userController = new UserController();
 
-export default (router: express.Router) =>{
-    router.post('/auth/register',userController.register);
-    router.post('/auth/login',userController.login);
-};
+// export default (router: express.Router) =>{
+//     router.post('/users/register',userController.register);
+//     router.post('/users/login',userController.login);
+// };

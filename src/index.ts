@@ -1,14 +1,13 @@
-import express from 'express';
+import express, {} from 'express';
 import  http  from 'http';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import router from './routes/user'
-
+// import { Router } from './routes/user'
 import swaggerUi from 'swagger-ui-express';
-
+import Router from './routes/userRoute';
 const app = express();
 
 
@@ -23,12 +22,9 @@ app.use(bodyParser.json());
 // app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 //=========================Server============================
-
+app.use('/',Router );
 const server = http.createServer(app);
-server.listen(8080,() => {
-    console.log('Connecting to server');
-    console.log('Server is running on http://localhost:8080');
-});
+
 
 const MONGO_URL = 'mongodb+srv://navin:navin@navin.bpmheu9.mongodb.net/?retryWrites=true&w=majority&appName=Navin';
 
@@ -37,4 +33,7 @@ mongoose.connect(MONGO_URL);
 mongoose.connection.on('error',(error:Error) => console.log(error));
 
 
-app.use('/', router());
+server.listen(8080,() => {
+    console.log('Connecting to server');
+    console.log('Server is running on http://localhost:8080');
+});
