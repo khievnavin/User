@@ -18,8 +18,8 @@
 import jwt from 'jsonwebtoken';
 const SECRET_KEY = 'NAVIN';
 
-export function generatedJWT(){
-    const jwtToken = jwt.sign({}, SECRET_KEY, { expiresIn: '2m' });
+export async function generatedJWT(email: string): Promise<string>{
+    const jwtToken = jwt.sign(email, SECRET_KEY);
 
 return jwtToken;
 }

@@ -27,9 +27,10 @@ const userController = new UserController();
             console.log(queryToken)
             const response = await userController.verifyToken(queryToken)
             res.json({
-                message:  `Verified successfully`
+                message:  `Verified successfully`,
+                jwtToken: response.jwtToken
             });
-          await response.deleteOne(queryToken) 
+        return  await response.deleteOne(queryToken) 
         }catch(error){
             _next(error)
         };

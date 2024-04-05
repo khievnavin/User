@@ -1,7 +1,7 @@
 // require ("dotenv").config();
 import { sender } from "./sender";
 
-export async function sendVerification(email: string , token: string , jwt: string){
+export async function sendVerification(email: string , token: string){
 
     ``
     const mailOptions = {

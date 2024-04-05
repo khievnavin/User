@@ -1,69 +1,71 @@
-import express from 'express';
-import { Request, Response } from 'express';
-import { authentication, random } from '../utils/const/authen';
-import { generateVerificationToken } from '../utils/generateToken';
-import { sendVerification } from '../utils/sendVerification';
-import {UserService} from "../service/userservice"
-import { saveToken } from '../service/userToken';
+import express from "express";
+import { Request, Response } from "express";
+import { authentication, random } from "../utils/const/authen";
+import { generateVerificationToken } from "../utils/generateToken";
+import { sendVerification } from "../utils/sendVerification";
+import { UserService } from "../service/userservice";
+import { saveToken } from "../service/userToken";
 // import {generateToken} from '../utils/jwt'
-import  authenticateToken  from '../routes/userRoute'
-import { UserModel } from '../db/model/users';
-import { generatedJWT } from '../utils/jwt';
+import authenticateToken from "../routes/userRoute";
+import { UserModel } from "../db/model/users";
+import { generatedJWT } from "../utils/jwt";
+import { JsonWebTokenError } from "jsonwebtoken";
 
 const userservice = new UserService();
 
 export class UserController {
-
-
   async register(req: express.Request, res: express.Response) {
     try {
-        const { email, password, username } = req.body;
+      const { email, password, username } = req.body;
 
-        if (!email || !password || !username) {
-            return res.status(400).json({ message: "Please fill all fields" });
-        }
-
-        const existingUser = await userservice.getUserByEmail(email);
-
-        if (existingUser) {
-            return res.status(400).json({ message: `Username: ${req.body.username} already exists ` });
-        }
-
-        const salt = random();
-        const user = await userservice.createUser({
-            email,
-            username,
-            authentication: {
-                salt,
-                password: authentication(salt, password) //key value
-            },
-        });
-
-        // Generate verification token
-        const token = generateVerificationToken();
-        const jwt = generatedJWT();
-        // Send verification email
-        sendVerification(email, token , jwt);
-        await saveToken(user.id, token , jwt);
-
-        return res.status(200).json({ message: `Create Successful , Name : ${req.body.username}  , Please check your email to Verify`});
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Internal server error" });
-    }
-}
-
-      async verifyToken(token: string): Promise<any> {
-        try {
-            const updatedUser = await userservice.verifyToken(token);
-
-          return updatedUser
-            
-        } catch (error) {
-           throw error
-        }
+      if (!email || !password || !username) {
+        return res.status(400).json({ message: "Please fill all fields" });
       }
 
+      const existingUser = await userservice.getUserByEmail(email);
+
+      if (existingUser) {
+        return res
+          .status(400)
+          .json({ message: `Username: ${req.body.username} already exists ` });
+      }
+
+      const salt = random();
+      const jwt = await generatedJWT(email);
+      const user = await userservice.createUser({
+        email,
+        username,
+        authentication: {
+          jwt,
+          salt,
+          password: authentication(salt, password, await jwt), //key value
+        },
+      });
+
+      // Generate verification token
+      const token = generateVerificationToken();
+
+      // Send verification email
+      sendVerification(email, token);
+      await saveToken(user.id, token, await jwt);
+
+      return res.status(200).json({
+        message: `Create Successful , Name : ${req.body.username} , Please check your email to Verify, JWT : ${jwt}`,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  }
+
+  async verifyToken(token: string): Promise<any> {
+    try {
+      const updatedUser = await userservice.verifyToken(token);
+      return updatedUser;
+    } catch (error) {
+      throw error;
+    }
+  }
 
   // async register(req: express.Request, res: express.Response) {
   //   try {
@@ -88,10 +90,9 @@ export class UserController {
   //         password: authentication(salt, password) //key value
   //       },
   //     });
-      
+
   //     // const token = generateVerificationToken();
   //     // sendVerification(email, token);
-      
 
   //     const token = generateVerificationToken(user.id)
   //     sendVerification(email, token);
@@ -106,33 +107,31 @@ export class UserController {
   //     return res.status(500).json({ message: "Internal server error" });
   //   }
   // }
-      // async verifyTokenAndSetVerificationStatus(token: string, userId: string): Promise<boolean> {
-      //   try {
-      //       // Verify the token
-      //       const verifiedUserId = await verifyTokenAndGetUserId(token);
-    
-      //       // Check if the verified user ID matches the provided user ID
-      //       if (verifiedUserId !== userId) {
-      //           console.log("Invalid token or user ID mismatch");
-      //           return false;
-      //       }
-    
-      //       // Update the user's verification status to true in the database
-      //       const updatedUser = await userservice.updateVerificationStatus(userId, true);
-    
-      //       if (!updatedUser) {
-      //           console.log("Failed to update verification status");
-      //           return false;
-      //       }
-    
-      //       return true;
-      //   } catch (error) {
-      //       console.error("Error verifying token and setting verification status:", error);
-      //       return false;
-      //   }
-      // }
-   
+  // async verifyTokenAndSetVerificationStatus(token: string, userId: string): Promise<boolean> {
+  //   try {
+  //       // Verify the token
+  //       const verifiedUserId = await verifyTokenAndGetUserId(token);
 
+  //       // Check if the verified user ID matches the provided user ID
+  //       if (verifiedUserId !== userId) {
+  //           console.log("Invalid token or user ID mismatch");
+  //           return false;
+  //       }
+
+  //       // Update the user's verification status to true in the database
+  //       const updatedUser = await userservice.updateVerificationStatus(userId, true);
+
+  //       if (!updatedUser) {
+  //           console.log("Failed to update verification status");
+  //           return false;
+  //       }
+
+  //       return true;
+  //   } catch (error) {
+  //       console.error("Error verifying token and setting verification status:", error);
+  //       return false;
+  //   }
+  // }
 
   async getAllUsers(req: express.Request, res: express.Response) {
     try {
@@ -146,7 +145,7 @@ export class UserController {
 
   async login(req: express.Request, res: express.Response) {
     try {
-      const { email, password } = req.body;
+      const { email, password, jwt } = req.body;
 
       if (!email || !password) {
         return res.sendStatus(400);
@@ -158,20 +157,34 @@ export class UserController {
         return res.sendStatus(400);
       }
 
-      const expectedHash = authentication(user.authentication.salt, password);
+      const expectedHash = authentication(
+        user.authentication.salt,
+        password,
+        jwt
+      );
 
       if (user.authentication.password !== expectedHash) {
         return res.sendStatus(404);
       }
 
       const salt = random();
-      user.authentication.sessionToken = authentication(salt, user._id.toString());
+      user.authentication.sessionToken = authentication(
+        salt,
+        jwt,
+        user._id.toString()
+      );
 
       await user.save();
 
-      res.cookie('NAVIN-AUTH', user.authentication.sessionToken, { domain: 'localhost', path: '/' });
+      res.cookie("NAVIN-AUTH", user.authentication.sessionToken, {
+        domain: "localhost",
+        path: "/",
+      });
 
-      return res.status(200).json({message:`Username: ${req.body.username}, Login Successful`}).end();
+      return res
+        .status(200)
+        .json({ message: `Username: ${req.body.username}, Login Successful` })
+        .end();
     } catch (error) {
       console.log(error);
       return res.sendStatus(400);
@@ -189,26 +202,25 @@ export class UserController {
     }
   }
 
-//   async deleteToken(queryToken: string){
-//     try {
-//         // Assuming you have a User model or interface with a field for tokens
-//         const user = await UserModel.findOneAndUpdate(
-//             { queryToken }, // Find user by token
-//             { $unset: { token: 1 } }, // Unset token field
-//             { new: true } // Return updated document
-//         );
+  //   async deleteToken(queryToken: string){
+  //     try {
+  //         // Assuming you have a User model or interface with a field for tokens
+  //         const user = await UserModel.findOneAndUpdate(
+  //             { queryToken }, // Find user by token
+  //             { $unset: { token: 1 } }, // Unset token field
+  //             { new: true } // Return updated document
+  //         );
 
-//         if (!user) {
-//             throw new Error('User not found');
-//         }
+  //         if (!user) {
+  //             throw new Error('User not found');
+  //         }
 
-//         return user;
-//     } catch (error) {
-//         throw new Error(`Failed to delete token: ${error.message}`);
-//     }
-// }
+  //         return user;
+  //     } catch (error) {
+  //         throw new Error(`Failed to delete token: ${error.message}`);
+  //     }
+  // }
 }
-
 
 ////=================================================================
 // import express from 'express';
@@ -222,13 +234,12 @@ export class UserController {
 // // import {Token} from '../db/model/tokendb'
 // import {saveToken} from '../service/userToken'
 
-
 // //getAllUsers
 // export const getAllUsers = async (req: express.Request, res: express.Response) => {
 //     try{
 //         const users = await getUser();
 
-//         return res.status(200).json(users); 
+//         return res.status(200).json(users);
 
 //     }catch(error){
 //         console.log(error);
@@ -255,53 +266,53 @@ export class UserController {
 // export const login = async (req: express.Request, res: express.Response) => {
 //     try {
 //       const { email, password } = req.body;
-  
+
 //       if (!email || !password) {
 //         return res.sendStatus(400);
 //       }
 //       const user = await getUserByEmail(email).select(
 //         "+ authentication.salt + authentication.password"
 //       );
-  
+
 //       if (!user) {
 //         return res.sendStatus(400);
 //       }
-  
+
 //       const expectedHash = authentication(user.authentication.salt, password);
-  
+
 //       if (user.authentication.password !== expectedHash) {
 //         return res.sendStatus(404);
 //       }
-   
+
 //       const salt = random();
 //       user.authentication.sessionToken = authentication(salt, user._id.toString());
-  
+
 //       await user.save();
-  
+
 //       res.cookie('NAVIN-AUTH', user.authentication.sessionToken, {domain: 'localhost', path: '/' });
-  
+
 //       return res.status(200).json(user).end();
-   
+
 //     } catch (error) {
 //       console.log(error);
 //       return res.sendStatus(400);
 //     }
 //   };
-  
+
 // //Register
 //   export const register = async (req: express.Request, res: express.Response) => {
 //     try {
 //       const { email, password, username } = req.body;
-  
+
 //       if (!email || !password || !username) {
 //         return res.status(400).json({ message: "Please fill all fields" });
 //       }
 //       const existingUser = await getUserByEmail(email);
-  
+
 //       if (existingUser) {
 //         return res.status(400).json({ message: "User already exists" });
 //       }
-  
+
 //       const salt = random();
 //       const user = await createUser({
 //         email,
@@ -313,7 +324,7 @@ export class UserController {
 //       });
 //       const token = generateVerificationToken();
 //       sendVerification(email, token);
-  
+
 //       return res.status(200).end(user);
 //     } catch (error) {
 //       console.log(error);

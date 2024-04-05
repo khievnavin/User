@@ -32,7 +32,7 @@ const UserSchema = new mongoose.Schema({
       type: String,
       select: false,
     },
-    JWT:{
+    jwt:{
       type: String,
       select: false,
     }

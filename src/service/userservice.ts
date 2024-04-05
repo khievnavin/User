@@ -1,6 +1,7 @@
 import {UserModel}  from '../db/model/users'; // Import your User model here
 import { UserRepository } from '../db/model/repository/userRepo';
 import Token from '../db/model/token';
+import { generatedJWT } from '../utils/jwt';
 export class UserService {
     private userRepository: UserRepository;
     constructor() {
@@ -80,20 +81,22 @@ export class UserService {
     async verifyToken(token: string): Promise<any> {
       try {
        const isTokenExits:any = await Token.findOne({token: token});
-        console.log(isTokenExits)
+  
        if(!isTokenExits){
         throw new Error('token is not found')
        }
 
        const user = await UserModel.findOne({_id: isTokenExits.userId});
-
+       
        if(!user){
         throw new Error('user is not found');
        }
+       const tokenJwt = await generatedJWT(user.email)
+
        user.isVerified = true;
         await user.save();
-
-        return user;
+        await Token.deleteOne({ token: isTokenExits.token})
+        return {user , tokenJwt};
       } catch (error) {
         console.error("Error verifying token and setting verification status:", error);
         return false;
