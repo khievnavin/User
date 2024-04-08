@@ -7,7 +7,9 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 // import { Router } from './routes/user'
 import swaggerUi from 'swagger-ui-express';
-import Router from './routes/userRoute';
+import Router from './routes/userRoute'; 
+import authRouter from './routes/authRoute';
+
 const app = express();
 
 
@@ -18,6 +20,7 @@ app.use(cors({
 app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.json());
+app.use('/', authRouter)
 
 // app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

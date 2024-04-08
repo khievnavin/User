@@ -1,3 +1,5 @@
+
+/// </reference types="passport-local" />
 {
     "compilerOptions": {
         "module": "NodeNext",
@@ -10,4 +12,6 @@
     },
 
     "include": ["src/**/*", "src/utils/const/authen.ts"],
+
+
 }

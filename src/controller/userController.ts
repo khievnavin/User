@@ -38,7 +38,7 @@ export class UserController {
         authentication: {
           jwt,
           salt,
-          password: authentication(salt, password, await jwt), //key value
+          password: authentication(salt, password), //key value
         },
       });
 
@@ -145,7 +145,7 @@ export class UserController {
 
   async login(req: express.Request, res: express.Response) {
     try {
-      const { email, password, jwt } = req.body;
+      const { email, password } = req.body;
 
       if (!email || !password) {
         return res.sendStatus(400);
@@ -159,8 +159,7 @@ export class UserController {
 
       const expectedHash = authentication(
         user.authentication.salt,
-        password,
-        jwt
+        password
       );
 
       if (user.authentication.password !== expectedHash) {
@@ -170,7 +169,6 @@ export class UserController {
       const salt = random();
       user.authentication.sessionToken = authentication(
         salt,
-        jwt,
         user._id.toString()
       );
 

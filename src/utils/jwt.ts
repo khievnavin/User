@@ -10,16 +10,19 @@
 //     const {token , expiresAt} = generateDate(50000);
 //     console.log("Generated token: ", token);
 //     console.log("Token expires at:", new Date(expiresAt));
-//     return token;	
+//     return token;
 // }
 
 //============================================================================
 
-import jwt from 'jsonwebtoken';
-const SECRET_KEY = 'NAVIN';
+import jwt from "jsonwebtoken";
+const SECRET_KEY = "NAVIN";
+const JWT_EXPIRATION_TIME = "1m";
 
-export async function generatedJWT(email: string): Promise<string>{
-    const jwtToken = jwt.sign(email, SECRET_KEY);
+export async function generatedJWT(email: string): Promise<string> {
+  const jwtToken = jwt.sign({email}, SECRET_KEY, {
+    expiresIn: JWT_EXPIRATION_TIME,
+  });
 
-return jwtToken;
+  return jwtToken;
 }

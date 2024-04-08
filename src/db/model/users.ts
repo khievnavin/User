@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema({
+  googleid:{
+  type: String,
+  
+  },
   username: {
     type: String,
     required: true,
@@ -14,14 +18,10 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  // verificationToken:{
-  //   type: String,
-  //   default: null,
-  // },
   authentication: {
     password: {
       type: String,
-      required: true,
+      trim: true,
       selected: false,
     },
     salt: {
