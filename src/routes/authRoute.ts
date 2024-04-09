@@ -3,12 +3,14 @@ import axios from 'axios';
 import { generateVerificationToken } from '../utils/generateToken';
 import { UserModel } from '../db/model/users';
 import { random } from 'lodash';
+require ('dotenv').config();
+
 
 const authRouter = express.Router();
 
-const CLIENT_ID = '463367092849-n0hfg85eh46esmfhtgahnnsbmca9r8ch.apps.googleusercontent.com';
-const CLIENT_SECRET = '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';
-const REDIRECT_URI = 'http://localhost:8080/auth/google/callback';
+const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const REDIRECT_URI = process.env.REDIRECT_URI;
 
 // Initiates the Google Login flow
 authRouter.get('/auth/google', (req, res) => {

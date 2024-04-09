@@ -15,12 +15,13 @@
 
 //============================================================================
 
+
 import jwt from "jsonwebtoken";
-const SECRET_KEY = "NAVIN";
-const JWT_EXPIRATION_TIME = "1m";
+require("dotenv").config();
+const JWT_EXPIRATION_TIME = "2m";
 
 export async function generatedJWT(email: string): Promise<string> {
-  const jwtToken = jwt.sign({email}, SECRET_KEY, {
+  const jwtToken = jwt.sign({email}, process.env.SECRET_KEY, {
     expiresIn: JWT_EXPIRATION_TIME,
   });
 

@@ -9,10 +9,10 @@ import mongoose from 'mongoose';
 import swaggerUi from 'swagger-ui-express';
 import Router from './routes/userRoute'; 
 import authRouter from './routes/authRoute';
-
+require('dotenv').config();
 const app = express();
 
-
+const Port = process.env.PORT ;
 app.use(cors({
     credentials : true,
 }))
@@ -36,7 +36,7 @@ mongoose.connect(MONGO_URL);
 mongoose.connection.on('error',(error:Error) => console.log(error));
 
 
-server.listen(8080,() => {
+server.listen(Port,() => {
     console.log('Connecting to server');
     console.log('Server is running on http://localhost:8080');
 });

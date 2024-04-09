@@ -3,7 +3,6 @@ import { sender } from "./sender";
 
 export async function sendVerification(email: string , token: string){
 
-    ``
     const mailOptions = {
         from: "khievnavin@gmail.com",
         to : email,
